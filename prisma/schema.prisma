@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Profile related fields
+  profileCompleted Boolean @default(false)
+  
+  // Activity related
+  activities     Activity[]     @relation("ActivityParticipants")
+  
+  // Likes and matches
+  likedUsers     Like[]         @relation("UserLikes")
+  likedByUsers   Like[]         @relation("LikedByUsers")
+  
+  // Messages
+  sentMessages     Message[]     @relation("SentMessages")
+  receivedMessages Message[]     @relation("ReceivedMessages")
+}
+
+model Activity {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  type        String
+  location    String
+  date        DateTime
+  price       Float
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  participants User[]      @relation("ActivityParticipants")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  liker     User     @relation("UserLikes", fields: [likerId], references: [id])
+  likerId   String
+  liked     User     @relation("LikedByUsers", fields: [likedId], references: [id])
+  likedId   String
+  isMatch   Boolean  @default(false)
+  activityId String?
+  createdAt DateTime @default(now())
+  
+  @@unique([likerId, likedId])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  content    String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
