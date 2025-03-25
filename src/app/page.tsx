@@ -1,17 +1,18 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 export default function Home() {
 	return (
-		<div className="flex flex-col min-h-screen">
+		<div className="flex flex-col min-h-screen w-full">
 			{/* Navigation */}
-			<header className="border-b">
-				<div className="container flex h-16 items-center justify-between">
+			<header className="border-b flex justify-center">
+				<div className="container flex h-16 items-center justify-between px-14">
 					<div className="flex items-center gap-6">
 						<Link href="/" className="text-xl font-bold">
-							TimeLeft
+							Amora
 						</Link>
 					</div>
-					<nav className="flex gap-4">
+					<nav className="flex gap-10 items-center">
 						<Link
 							href="/auth/login"
 							className="text-sm font-medium hover:underline"
@@ -26,9 +27,9 @@ export default function Home() {
 			</header>
 
 			{/* Hero Section */}
-			<section className="flex-1">
+			<section className="flex-1 flex justify-center px-14">
 				<div className="container flex flex-col items-center justify-center space-y-8 py-24 text-center md:py-32">
-					<div className="space-y-4">
+					<div className="space-y-4 flex flex-col items-center">
 						<h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
 							Meet New People Through{" "}
 							<span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
@@ -60,7 +61,7 @@ export default function Home() {
 			</section>
 
 			{/* Feature Section */}
-			<section className="border-t bg-gray-50 py-16">
+			<section className="border-t bg-gray-50 py-16 flex justify-center px-14">
 				<div className="container space-y-12">
 					<div className="text-center">
 						<h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
@@ -109,7 +110,7 @@ export default function Home() {
 			</section>
 
 			{/* CTA Section */}
-			<section className="py-16">
+			<section className="py-16 flex justify-center px-14">
 				<div className="container">
 					<div className="rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 p-8 text-center text-white">
 						<h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
@@ -134,10 +135,10 @@ export default function Home() {
 			</section>
 
 			{/* Footer */}
-			<footer className="border-t py-8">
+			<footer className="border-t py-8 flex justify-center px-14">
 				<div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
 					<p className="text-sm text-gray-500">
-						© 2024 TimeLeft. All rights reserved.
+						© 2024 Amora. All rights reserved.
 					</p>
 					<div className="flex gap-4">
 						<Link

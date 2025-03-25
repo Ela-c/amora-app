@@ -64,7 +64,7 @@ export function Navigation() {
 			<div className="container flex h-16 items-center justify-between">
 				<div className="flex items-center gap-6">
 					<Link href="/" className="text-xl font-bold">
-						TimeLeft
+						Amora
 					</Link>
 					<nav className="hidden md:flex gap-6">
 						{navItems.map((item) => (

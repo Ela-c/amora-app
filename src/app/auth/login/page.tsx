@@ -63,9 +63,7 @@ export default function LoginPage() {
 		<div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
 			<div className="w-full max-w-md space-y-8">
 				<div className="text-center">
-					<h1 className="text-4xl font-bold tracking-tight">
-						TimeLeft
-					</h1>
+					<h1 className="text-4xl font-bold tracking-tight">Amora</h1>
 					<p className="mt-2 text-lg text-gray-600">
 						Sign in to your account
 					</p>
