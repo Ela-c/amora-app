@@ -18,26 +18,22 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { PasswordSchema } from "@/models/user";
 
 const formSchema = z
 	.object({
-		name: z.string().min(2, {
-			message: "Name must be at least 2 characters.",
-		}),
-		email: z.string().email({
-			message: "Please enter a valid email address.",
-		}),
-		password: z.string().min(8, {
-			message: "Password must be at least 8 characters.",
-		}),
-		confirmPassword: z.string().min(8, {
-			message: "Password must be at least 8 characters.",
-		}),
+		firstName: z.string().min(1, "First name is required"),
+		lastName: z.string().min(1, "Last name is required"),
+		email: z.string().email("Invalid email address"),
+		password: PasswordSchema,
+		confirmPassword: PasswordSchema,
 	})
 	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords do not match",
+		message: "Passwords don't match",
 		path: ["confirmPassword"],
 	});
+
+type FormData = z.infer<typeof formSchema>;
 
 export default function SignupPage() {
 	const router = useRouter();
@@ -46,25 +42,37 @@ export default function SignupPage() {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: "",
+			firstName: "",
+			lastName: "",
 			email: "",
 			password: "",
 			confirmPassword: "",
 		},
 	});
 
-	async function onSubmit(values: z.infer<typeof formSchema>) {
+	async function onSubmit(values: FormData) {
 		setIsLoading(true);
 
 		try {
-			// Here we would typically make an API call to register the user
-			// For now, we'll just simulate registration
-			// TODO: Implement actual registration with NextAuth
+			const response = await fetch("/api/auth/sign-up", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					firstName: values.firstName,
+					lastName: values.lastName,
+					email: values.email,
+					password: values.password,
+				}),
+			});
 
-			setTimeout(() => {
-				toast.success("Account created successfully!");
-				router.push("/profile/setup");
-			}, 1000);
+			if (!response.ok) {
+				throw new Error("Failed to create account");
+			}
+
+			toast.success("Account created successfully!");
+			router.push("/profile/setup");
 		} catch (error) {
 			toast.error("Failed to create account. Please try again.");
 		} finally {
@@ -89,10 +97,26 @@ export default function SignupPage() {
 					>
 						<FormField
 							control={form.control}
-							name="name"
+							name="firstName"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Full Name</FormLabel>
+									<FormLabel>First Name</FormLabel>
+									<FormControl>
+										<Input
+											placeholder="John Doe"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="lastName"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Last Name</FormLabel>
 									<FormControl>
 										<Input
 											placeholder="John Doe"

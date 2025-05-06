@@ -44,14 +44,22 @@ export default function LoginPage() {
 		setIsLoading(true);
 
 		try {
-			// Here we would typically make an API call to authenticate the user
-			// For now, we'll just simulate a login
-			// TODO: Implement actual authentication with NextAuth
+			const response = await fetch("/api/auth/sign-in", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(values),
+				credentials: "include",
+			});
 
-			setTimeout(() => {
-				toast.success("Successfully logged in!");
-				router.push("/dashboard");
-			}, 1000);
+			if (!response.ok) {
+				const error = await response.json();
+				throw new Error(error.message || "Failed to sign in");
+			}
+
+			toast.success("Successfully logged in!");
+			router.push("/dashboard");
 		} catch (error) {
 			toast.error("Failed to log in. Please check your credentials.");
 		} finally {

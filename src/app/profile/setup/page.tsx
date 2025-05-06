@@ -123,7 +123,7 @@ export default function ProfileSetupPage() {
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsLoading(true);
-
+		console.log("Form submitted:", values);
 		try {
 			// Here we would typically make an API call to save the profile data
 			// For now, we'll just simulate the save process

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,10 +12,11 @@ import {
 	Settings,
 	LogOut,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export function Navigation() {
 	const pathname = usePathname();
-
+	const router = useRouter();
 	// Mock user data (would come from auth context in a real app)
 	const user = {
 		name: "John Doe",
@@ -26,9 +27,17 @@ export function Navigation() {
 		return pathname === path || pathname.startsWith(`${path}/`);
 	};
 
-	const handleLogout = () => {
-		// Here you would implement actual logout logic
-		window.location.href = "/";
+	const handleLogout = async () => {
+		try {
+			const response = await fetch("/api/auth/logout", {
+				method: "GET",
+				credentials: "include",
+			});
+			if (!response.ok) throw new Error("Failed to logout");
+			router.push("/");
+		} catch (error) {
+			toast.error("Failed to logout");
+		}
 	};
 
 	const navItems = [
