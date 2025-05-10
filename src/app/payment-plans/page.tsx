@@ -249,6 +249,13 @@ export default function PaymentPlansPage() {
 
   const handleCompleteCheckout = async () => {
     if (selectedPlanName) {
+      // If the selected plan is the free one, redirect to dashboard directly
+      if (selectedPlanName === "Free Spirit") {
+        console.log("Free Spirit plan selected, redirecting to dashboard.");
+        router.push("/dashboard");
+        return; // Exit early, no payment processing needed
+      }
+
       const plan = paymentPlans.find(p => p.name === selectedPlanName);
       if (!plan) {
         console.error("Selected plan not found");
