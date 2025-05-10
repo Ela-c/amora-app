@@ -25,7 +25,7 @@ interface NavUser {
 export function Navigation() {
 	const pathname = usePathname();
 	const router = useRouter();
-	
+
 	const [user, setUser] = useState<NavUser | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -36,7 +36,12 @@ export function Navigation() {
 				const response = await fetch("/api/auth/me");
 				if (response.ok) {
 					const userData = await response.json();
-					setUser({ name: `${userData.firstName} ${userData.lastName}`, firstName: userData.firstName, image: "https://source.unsplash.com/random/?portrait,person" });
+					console.log("User data:", userData);
+					setUser({
+						name: `${userData.firstName} ${userData.lastName}`,
+						firstName: userData.firstName,
+						image: "https://source.unsplash.com/random/?portrait,person",
+					});
 				} else {
 					setUser(null);
 				}
@@ -89,13 +94,15 @@ export function Navigation() {
 			path: "/profile",
 			icon: <Users className="h-5 w-5" />,
 		},
-		...(user ? [
-			{
-				name: "Our Plans",
-				path: "/payment-plans",
-				icon: <CreditCard className="h-5 w-5" />,
-			}
-		] : []),
+		...(user
+			? [
+					{
+						name: "Our Plans",
+						path: "/payment-plans",
+						icon: <CreditCard className="h-5 w-5" />,
+					},
+			  ]
+			: []),
 		{
 			name: "Settings",
 			path: "/settings",
@@ -107,7 +114,10 @@ export function Navigation() {
 		<header className="border-b">
 			<div className="container flex h-16 items-center justify-between">
 				<div className="flex items-center gap-6">
-					<Link href={user ? "/dashboard" : "/"} className="text-xl font-bold">
+					<Link
+						href={user ? "/dashboard" : "/"}
+						className="text-xl font-bold"
+					>
 						Amora
 					</Link>
 					{user && (

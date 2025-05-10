@@ -53,7 +53,7 @@ export class UserDataAccess {
 
     static async getUserById(safeId: number): Promise<{ success: boolean; user?: User; error?: string }> {
         try {
-            const query = 'SELECT * FROM users WHERE id = $1';
+            const query = 'SELECT first_name AS "firstName", last_name AS "lastName", email, role, id FROM users WHERE id = $1';
             const result = await this.pool.query(query, [safeId]);
             
             if (result.rows.length === 0) {
@@ -62,7 +62,7 @@ export class UserDataAccess {
                     error: 'User not found'
                 };
             }
-
+            // console.log('User found:', result.rows[0]);
             return {
                 success: true,
                 user: result.rows[0]

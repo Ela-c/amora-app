@@ -63,7 +63,7 @@ export async function GET() {
             lastName: userResult.user.lastName,
             role: userResult.user.role,
         };
-
+        console.log('Sanitized user data:', sanitizedUser);
         return NextResponse.json(sanitizedUser, { status: 200 });
 
     } catch (error) {
