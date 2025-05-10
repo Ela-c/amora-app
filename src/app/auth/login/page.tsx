@@ -61,6 +61,7 @@ export default function LoginPage() {
 			toast.success("Successfully logged in!");
 			router.push("/dashboard");
 		} catch (error) {
+			console.error("Login error:", error);
 			toast.error("Failed to log in. Please check your credentials.");
 		} finally {
 			setIsLoading(false);

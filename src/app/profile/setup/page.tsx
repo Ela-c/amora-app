@@ -133,6 +133,7 @@ export default function ProfileSetupPage() {
 				router.push("/dashboard");
 			}, 1500);
 		} catch (error) {
+			console.error("Error saving profile:", error);
 			toast.error("Failed to save profile. Please try again.");
 		} finally {
 			setIsLoading(false);

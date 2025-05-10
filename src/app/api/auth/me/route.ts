@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { SessionDataAccess } from '@/persistance/session-data-access';
 import { UserDataAccess } from '@/persistance/user-data-access';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         // Get session token from cookies
         const cookieStore = await cookies();

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
 export default function Home() {
 	return (
 		<div className="flex flex-col min-h-screen w-full">

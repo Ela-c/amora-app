@@ -5,11 +5,10 @@ import { Pool } from "pg";
 
 export class UserDataAccess {
     private static pool = new Pool({
-        user: process.env.DB_USER,
-        host: process.env.DB_HOST,
-        database: process.env.DB_NAME,
-        password: process.env.DB_PASSWORD,
-        port: parseInt(process.env.DB_PORT || '5432'),
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false,
+        },
     });
 
     static async createUser(safeUserData: { firstName: string;
@@ -36,7 +35,7 @@ export class UserDataAccess {
             if (result.rows.length === 0) {
                 return {
                     success: false,
-                    error: 'Failed to create user'
+                    error: 'Failed to execute query to create user'
                 };
             }
 
@@ -47,7 +46,7 @@ export class UserDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }
@@ -71,7 +70,7 @@ export class UserDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }
@@ -95,7 +94,7 @@ export class UserDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }
@@ -123,7 +122,7 @@ export class UserDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }
@@ -146,7 +145,7 @@ export class UserDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }
@@ -167,7 +166,7 @@ export class UserDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }

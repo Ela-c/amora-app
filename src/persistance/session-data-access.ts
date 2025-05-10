@@ -4,11 +4,10 @@ import { Pool } from "pg";
 
 export class SessionDataAccess {
     private static pool = new Pool({
-        user: process.env.DB_USER,
-        host: process.env.DB_HOST,
-        database: process.env.DB_NAME,
-        password: process.env.DB_PASSWORD,
-        port: parseInt(process.env.DB_PORT || '5432'),
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+            rejectUnauthorized: false,
+        },
     });
 
     private static readonly COOKIE_SESSION_NAME = 'session-id';
@@ -43,7 +42,7 @@ export class SessionDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }
@@ -67,7 +66,7 @@ export class SessionDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }
@@ -105,7 +104,7 @@ export class SessionDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }
@@ -126,7 +125,7 @@ export class SessionDataAccess {
         } catch (error) {
             return {
                 success: false,
-                error: 'Database error occurred'
+                error: error instanceof Error ? error.message : 'Database error occurred'
             };
         }
     }

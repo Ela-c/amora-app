@@ -74,6 +74,7 @@ export default function SignupPage() {
 			toast.success("Account created successfully!");
 			router.push("/profile/setup");
 		} catch (error) {
+			console.error("Signup error:", error);
 			toast.error("Failed to create account. Please try again.");
 		} finally {
 			setIsLoading(false);

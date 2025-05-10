@@ -100,10 +100,18 @@ export default function Dashboard() {
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState("upcoming");
 	const [showParticipantsDialog, setShowParticipantsDialog] = useState(false);
-	const [currentActivity, setCurrentActivity] = useState<any>(null);
-	const [participants, setParticipants] = useState<any[]>([]);
+	const [currentActivity, setCurrentActivity] = useState<Record<
+		string,
+		unknown
+	> | null>(null);
+	const [participants, setParticipants] = useState<Record<string, unknown>[]>(
+		[]
+	);
 	const [showChatDialog, setShowChatDialog] = useState(false);
-	const [currentMatch, setCurrentMatch] = useState<any>(null);
+	const [currentMatch, setCurrentMatch] = useState<Record<
+		string,
+		unknown
+	> | null>(null);
 
 	// Format date to readable format
 	const formatDate = (dateString: string) => {
@@ -152,9 +160,9 @@ export default function Dashboard() {
 		router.push(`/activities/${activityId}`);
 	};
 
-	const handleViewParticipants = (activity: any) => {
+	const handleViewParticipants = (activity: Record<string, unknown>) => {
 		setCurrentActivity(activity);
-		setParticipants(activity.participants);
+		setParticipants(activity.participants as Record<string, unknown>[]);
 		setShowParticipantsDialog(true);
 	};
 
@@ -178,12 +186,19 @@ export default function Dashboard() {
 					// Add to matches (in a real app, this would be handled by the backend)
 					matches.push({
 						id: `m${matches.length + 1}`,
-						name: participant.name,
-						image: participant.image,
-						activity: currentActivity.title,
-						activityDate: new Date(
-							currentActivity.date
-						).toLocaleDateString("en-US", {
+						name:
+							typeof participant.name === "string"
+								? participant.name
+								: "Unknown name",
+						image:
+							typeof participant.image === "string"
+								? participant.image
+								: "No image",
+						activity:
+							typeof currentActivity?.title === "string"
+								? currentActivity.title
+								: "Unknown Activity",
+						activityDate: new Date().toLocaleDateString("en-US", {
 							month: "long",
 							day: "numeric",
 							year: "numeric",
@@ -197,7 +212,7 @@ export default function Dashboard() {
 		}
 	};
 
-	const handleOpenChat = (match: any) => {
+	const handleOpenChat = (match: Record<string, unknown>) => {
 		setCurrentMatch(match);
 		setShowChatDialog(true);
 	};
@@ -311,7 +326,9 @@ export default function Dashboard() {
 								No upcoming activities
 							</h2>
 							<p className="text-gray-500 mb-6">
-								You haven't signed up for any activities yet.
+								{
+									"You haven't signed up for any activities yet."
+								}
 							</p>
 							<Button onClick={handleFindActivities}>
 								Browse Activities
@@ -424,7 +441,9 @@ export default function Dashboard() {
 								No past activities
 							</h2>
 							<p className="text-gray-500 mb-6">
-								When you attend activities, they'll appear here.
+								{
+									"When you attend activities, they'll appear here."
+								}
 							</p>
 							<Button onClick={handleFindActivities}>
 								Browse Activities
@@ -488,9 +507,9 @@ export default function Dashboard() {
 								No matches yet
 							</h2>
 							<p className="text-gray-500 mb-6">
-								When you and someone else both express interest
-								after an activity, you'll be matched and can
-								chat here.
+								{
+									"When you and someone else both express interest after an activity, you'll be matched and can chat here."
+								}
 							</p>
 							<Button onClick={handleFindActivities}>
 								Find Activities
@@ -509,30 +528,33 @@ export default function Dashboard() {
 					<DialogHeader>
 						<DialogTitle>Rate Participants</DialogTitle>
 						<DialogDescription>
-							Let us know who you'd like to connect with from{" "}
-							{currentActivity?.title}.
+							{"Let us know who you'd like to connect with from"}{" "}
+							{currentActivity?.title as string}.
 						</DialogDescription>
 					</DialogHeader>
 
 					<div className="py-4 space-y-4">
 						{participants.map((participant) => (
 							<div
-								key={participant.id}
+								key={participant.id as string}
 								className="flex items-center justify-between"
 							>
 								<div className="flex items-center space-x-3">
 									<Avatar>
 										<AvatarImage
-											src={participant.image}
-											alt={participant.name}
+											src={participant.image as string}
+											alt={participant.name as string}
 										/>
 										<AvatarFallback>
-											{participant.name.charAt(0)}
+											{typeof participant.name ===
+											"string"
+												? participant.name.charAt(0)
+												: "u"}
 										</AvatarFallback>
 									</Avatar>
 									<div>
 										<p className="font-medium">
-											{participant.name}
+											{participant.name as string}
 										</p>
 									</div>
 								</div>
@@ -543,7 +565,9 @@ export default function Dashboard() {
 											: "outline"
 									}
 									onClick={() =>
-										handleLikeParticipant(participant.id)
+										handleLikeParticipant(
+											participant.id as string
+										)
 									}
 								>
 									{participant.liked ? "Liked" : "Like"}
@@ -567,11 +591,11 @@ export default function Dashboard() {
 				<DialogContent className="sm:max-w-md">
 					<DialogHeader>
 						<DialogTitle>
-							Chat with {currentMatch?.name}
+							Chat with {currentMatch?.name as string}
 						</DialogTitle>
 						<DialogDescription>
-							You met at {currentMatch?.activity} on{" "}
-							{currentMatch?.activityDate}
+							You met at {currentMatch?.activity as string} on{" "}
+							{currentMatch?.activityDate as string}
 						</DialogDescription>
 					</DialogHeader>
 
@@ -587,15 +611,15 @@ export default function Dashboard() {
 								</span>
 							</div>
 
-							{currentMatch?.lastMessage && (
+							{currentMatch?.lastMessage !== undefined && (
 								<div className="bg-blue-50 rounded-lg p-3 w-3/4">
 									<p className="text-sm">
-										{currentMatch.lastMessage}
+										{currentMatch.lastMessage as string}
 									</p>
 									<span className="text-xs text-gray-500 mt-1 block">
-										{currentMatch.name},{" "}
+										{currentMatch.name as string},{" "}
 										{formatRelativeTime(
-											currentMatch.matchDate
+											currentMatch.matchDate as string
 										)}
 									</span>
 								</div>
