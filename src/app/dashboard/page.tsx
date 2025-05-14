@@ -112,6 +112,25 @@ export default function Dashboard() {
 		string,
 		unknown
 	> | null>(null);
+	const [messages, setMessages] = useState<{ text: string; sender: string; time: string }[]>(() => {
+		// Initialize with greeting and match reply if available
+		const initial: { text: string; sender: string; time: string }[] = [
+			{
+				text: 'Hi! It was great meeting you at the activity!',
+				sender: 'user',
+				time: '2 days ago',
+			},
+		];
+		if (matches[0]?.lastMessage) {
+			initial.push({
+				text: matches[0].lastMessage,
+				sender: 'match',
+				time: 'Mar 16',
+			});
+		}
+		return initial;
+	});
+	const [newMessage, setNewMessage] = useState("");
 
 	// Format date to readable format
 	const formatDate = (dateString: string) => {
@@ -219,6 +238,16 @@ export default function Dashboard() {
 
 	const handleFindActivities = () => {
 		router.push("/activities");
+	};
+
+	const handleSendMessage = () => {
+		if (newMessage.trim() !== "") {
+			setMessages([
+				...messages,
+				{ text: newMessage, sender: "user", time: "just now" },
+			]);
+			setNewMessage("");
+		}
 	};
 
 	return (
@@ -486,17 +515,12 @@ export default function Dashboard() {
 												Met at: {match.activity} on{" "}
 												{match.activityDate}
 											</p>
-											{match.lastMessage && (
-												<p className="text-sm truncate mt-1">
-													{match.lastMessage}
-												</p>
+											{match.unreadCount > 0 && (
+												<div className="ml-2 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+													{match.unreadCount}
+												</div>
 											)}
 										</div>
-										{match.unreadCount > 0 && (
-											<div className="ml-2 bg-blue-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-												{match.unreadCount}
-											</div>
-										)}
 									</div>
 								</CardContent>
 							</Card>
@@ -601,29 +625,29 @@ export default function Dashboard() {
 
 					<div className="py-4 h-80 overflow-y-auto border rounded-md p-3 bg-gray-50">
 						<div className="flex flex-col space-y-3">
-							<div className="bg-white rounded-lg p-3 w-3/4 ml-auto">
-								<p className="text-sm">
-									Hi! It was great meeting you at the
-									activity!
-								</p>
-								<span className="text-xs text-gray-500 mt-1 block text-right">
-									You, 2 days ago
-								</span>
-							</div>
-
-							{currentMatch?.lastMessage !== undefined && (
-								<div className="bg-blue-50 rounded-lg p-3 w-3/4">
-									<p className="text-sm">
-										{currentMatch.lastMessage as string}
-									</p>
-									<span className="text-xs text-gray-500 mt-1 block">
-										{currentMatch.name as string},{" "}
-										{formatRelativeTime(
-											currentMatch.matchDate as string
-										)}
+							{messages.map((message, index) => (
+								<div
+									key={index}
+									className={`rounded-lg p-3 w-3/4 ${
+										message.sender === 'user'
+											? 'bg-white ml-auto'
+											: 'bg-blue-50'
+									}`}
+								>
+									<p className="text-sm">{message.text}</p>
+									<span
+										className={`text-xs text-gray-500 mt-1 block ${
+											message.sender === 'user'
+												? 'text-right'
+												: ''
+										}`}
+									>
+										{message.sender === 'user'
+											? `You, ${message.time}`
+											: `${currentMatch?.name}, ${message.time}`}
 									</span>
 								</div>
-							)}
+							))}
 						</div>
 					</div>
 
@@ -631,8 +655,16 @@ export default function Dashboard() {
 						<input
 							className="flex-1 border rounded-md px-3 py-2"
 							placeholder="Type a message..."
+							value={newMessage}
+							onChange={(e) => setNewMessage(e.target.value)}
+							onKeyPress={(e) => {
+								if (e.key === 'Enter' && !e.shiftKey) {
+									e.preventDefault();
+									handleSendMessage();
+								}
+							}}
 						/>
-						<Button>Send</Button>
+						<Button onClick={handleSendMessage}>Send</Button>
 					</div>
 				</DialogContent>
 			</Dialog>
