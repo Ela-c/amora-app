@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -96,6 +96,8 @@ const matches = [
 	},
 ];
 
+type Match = typeof matches[0];
+
 export default function Dashboard() {
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState("upcoming");
@@ -108,10 +110,36 @@ export default function Dashboard() {
 		[]
 	);
 	const [showChatDialog, setShowChatDialog] = useState(false);
-	const [currentMatch, setCurrentMatch] = useState<Record<
-		string,
-		unknown
-	> | null>(null);
+	const [currentMatch, setCurrentMatch] = useState<Match | null>(null);
+	const [messages, setMessages] = useState<Array<{
+		id: string;
+		text: string;
+		sender: 'user' | 'match';
+		timestamp: string;
+	}>>([
+		{
+			id: '1',
+			text: 'Hi! It was great meeting you at the activity!',
+			sender: 'user',
+			timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
+		},
+		{
+			id: '2',
+			text: 'That was such a fun class! Would love to meet up again.',
+			sender: 'match',
+			timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+		},
+	]);
+	const [newMessage, setNewMessage] = useState('');
+	const [isSending, setIsSending] = useState(false);
+	const chatContainerRef = useRef<HTMLDivElement>(null);
+
+	// Auto-scroll to bottom when new messages arrive
+	useEffect(() => {
+		if (chatContainerRef.current) {
+			chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+		}
+	}, [messages]);
 
 	// Format date to readable format
 	const formatDate = (dateString: string) => {
@@ -213,12 +241,45 @@ export default function Dashboard() {
 	};
 
 	const handleOpenChat = (match: Record<string, unknown>) => {
-		setCurrentMatch(match);
+		setCurrentMatch(match as Match);
 		setShowChatDialog(true);
 	};
 
 	const handleFindActivities = () => {
 		router.push("/activities");
+	};
+
+	const handleSendMessage = async () => {
+		if (!newMessage.trim() || isSending) return;
+
+		setIsSending(true);
+		const message = {
+			id: Date.now().toString(),
+			text: newMessage.trim(),
+			sender: 'user' as const,
+			timestamp: new Date().toISOString(),
+		};
+
+		setMessages(prev => [...prev, message]);
+		setNewMessage('');
+
+		// Update the last message in the matches list
+		if (currentMatch) {
+			const updatedMatch: Match = {
+				...currentMatch,
+				lastMessage: message.text,
+			};
+			setCurrentMatch(updatedMatch);
+			// In a real app, you would update this in the backend
+			const matchIndex = matches.findIndex(m => m.id === currentMatch.id);
+			if (matchIndex !== -1) {
+				matches[matchIndex] = updatedMatch;
+			}
+		}
+
+		// Simulate network delay
+		await new Promise(resolve => setTimeout(resolve, 500));
+		setIsSending(false);
 	};
 
 	return (
@@ -599,31 +660,24 @@ export default function Dashboard() {
 						</DialogDescription>
 					</DialogHeader>
 
-					<div className="py-4 h-80 overflow-y-auto border rounded-md p-3 bg-gray-50">
+					<div ref={chatContainerRef} className="py-4 h-80 overflow-y-auto border rounded-md p-3 bg-gray-50">
 						<div className="flex flex-col space-y-3">
-							<div className="bg-white rounded-lg p-3 w-3/4 ml-auto">
-								<p className="text-sm">
-									Hi! It was great meeting you at the
-									activity!
-								</p>
-								<span className="text-xs text-gray-500 mt-1 block text-right">
-									You, 2 days ago
-								</span>
-							</div>
-
-							{currentMatch?.lastMessage !== undefined && (
-								<div className="bg-blue-50 rounded-lg p-3 w-3/4">
-									<p className="text-sm">
-										{currentMatch.lastMessage as string}
-									</p>
-									<span className="text-xs text-gray-500 mt-1 block">
-										{currentMatch.name as string},{" "}
-										{formatRelativeTime(
-											currentMatch.matchDate as string
-										)}
+							{messages.map((message) => (
+								<div
+									key={message.id}
+									className={`rounded-lg p-3 w-3/4 ${
+										message.sender === 'user'
+											? 'bg-white ml-auto'
+											: 'bg-blue-50'
+									}`}
+								>
+									<p className="text-sm">{message.text}</p>
+									<span className="text-xs text-gray-500 mt-1 block text-right">
+										{message.sender === 'user' ? 'You' : currentMatch?.name as string},{" "}
+										{formatRelativeTime(message.timestamp)}
 									</span>
 								</div>
-							)}
+							))}
 						</div>
 					</div>
 
@@ -631,8 +685,19 @@ export default function Dashboard() {
 						<input
 							className="flex-1 border rounded-md px-3 py-2"
 							placeholder="Type a message..."
+							value={newMessage}
+							onChange={(e) => setNewMessage(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter' && !e.shiftKey) {
+									e.preventDefault();
+									handleSendMessage();
+								}
+							}}
+							disabled={isSending}
 						/>
-						<Button>Send</Button>
+						<Button onClick={handleSendMessage} disabled={isSending || !newMessage.trim()}>
+							{isSending ? 'Sending...' : 'Send'}
+						</Button>
 					</div>
 				</DialogContent>
 			</Dialog>
