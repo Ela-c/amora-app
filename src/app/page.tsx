@@ -55,6 +55,15 @@ export default function Home() {
 								Browse Activities
 							</Button>
 						</Link>
+						<Link href="/find-similar">
+							<Button
+								size="lg"
+								variant="outline"
+								className="px-8"
+							>
+								Find Similar People
+							</Button>
+						</Link>
 					</div>
 				</div>
 			</section>
